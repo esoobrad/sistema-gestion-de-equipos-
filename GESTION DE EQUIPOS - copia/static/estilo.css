@@ -1,4 +1,4 @@
-/* ===== Paleta y base ===== */
+ /* esto esta hecho un desastre por que la verdad solo anote lo que se me seguia ocurriendo sin borrar lo que ya tenia XDDD*/
 :root{
   --bg:#0b1220;          /* fondo principal */
   --bg-card:#121a2b;     /* tarjetas */
@@ -42,7 +42,6 @@ html, body{
     drop-shadow(0 0 64px rgba(0,120,255,0.55));
 }
 
-/* (OPCIONAL) Halo animado deluxe: usar contenedor .logo-glow (ver nota al final) */
 .logo-glow{
   position: relative;
   display: inline-block;
@@ -104,7 +103,7 @@ html, body{
 .menu-title{ font-weight:700; margin-top:.25rem; }
 .menu-sub{ color: var(--muted); font-size:.9rem; }
 
-/* ===== Inputs y botones ===== */
+
 .dark-input{
   background-color: #0d1526;
   color: var(--text);
@@ -145,7 +144,7 @@ html, body{
 }
 .btn-pill{ border-radius: 999px; }
 
-/* ===== Tablas y badges ===== */
+
 .table-dark{
   --bs-table-bg: #0e1628;
   --bs-table-striped-bg: #0f1a30;
@@ -168,11 +167,11 @@ html, body{
   font-weight:600;
 }
 
-/* ===== util ===== */
+
 .text-muted{ color: var(--muted) !important; }
 .section-title{ margin: 1rem 0 .5rem; font-weight:700; }
 
-/* ===== Canvas de fondo (full screen detrás del contenido) ===== */
+
 #webgl-canvas{
   position: fixed;
   inset: 0;           /* top:0; right:0; bottom:0; left:0 */
@@ -188,7 +187,7 @@ body > *:not(#webgl-canvas){
   z-index: 1;
 }
 
-/* Velo sutil para mejorar legibilidad sobre el canvas */
+
 .dark-bg::before{
   content: "";
   position: fixed;
@@ -198,7 +197,7 @@ body > *:not(#webgl-canvas){
   z-index: 0;
 }
 
-/* ===== Grid limpio para IPs ===== */
+
 .ip-grid{
   display:grid;
   gap:.75rem;
@@ -209,19 +208,19 @@ body > *:not(#webgl-canvas){
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
 }
 
-/* Tarjetas de IP: azul sólido, alto contraste */
+
 .ip-card{
   display:flex; align-items:center; justify-content:space-between;
   gap:.6rem;
   padding:.70rem .85rem;
   border-radius:.9rem;
 
-  background: #00143aab;                 /* azul fuerte base */
-  border: 1px solid #00143aab;  /* borde azul vivo */
+  background: #00143aab;                 
+  border: 1px solid #00143aab;  
   color: #ffffff;
   box-shadow: 0 6px 16px rgba(10, 61, 145, .35);
 
-  backdrop-filter: none;               /* sin transparencia */
+  backdrop-filter: none;              
   transition: transform .18s ease, background .18s ease, border-color .18s ease;
 }
 
@@ -233,7 +232,7 @@ body > *:not(#webgl-canvas){
 }
 
 .ip-card:hover{
-  background: #00050ca4;                 /* más oscuro al hover */
+  background: #00050ca4;                 
   border-color: #2A6FF2;
   transform: translateY(-2px);
 }
@@ -243,7 +242,7 @@ body > *:not(#webgl-canvas){
   outline-offset: 2px;
 }
 
-/* Botón copiar dentro de la tarjeta */
+
 .ip-card .btn-copy{
   --btn-bg: #00143a;
   --btn-bg-h: #00143a;
@@ -273,9 +272,9 @@ body > *:not(#webgl-canvas){
     drop-shadow(0 0 65px rgba(0,120,255,0.55));
 }
 
-/* Contenedor circular */
+
 .logo-glow{
-  --halo-size: 180px;        /* Tamaño del halo (ajústalo si lo quieres más grande o pequeño) */
+  --halo-size: 180px;       
   position: relative;
   width: var(--halo-size);
   height: var(--halo-size);
@@ -285,7 +284,7 @@ body > *:not(#webgl-canvas){
   border-radius: 50%;
 }
 
-/* Logo centrado dentro del círculo */
+
 .logo-glow > .login-logo{
   max-width: 250%;
   max-height: 250%;
@@ -294,7 +293,7 @@ body > *:not(#webgl-canvas){
   z-index: 1;
 }
 
-/* Halo circular animado azul-turquesa */
+
 .logo-glow::before{
   content:"";
   position:absolute;
@@ -313,14 +312,15 @@ body > *:not(#webgl-canvas){
   z-index: 0;
 }
 
-/* Animación del halo circular */
+
 @keyframes haloSpin{
   0%   { transform: rotate(0deg);   opacity:.9; }
   50%  {                         opacity:.78; }
   100% { transform: rotate(360deg); opacity:.9; }
 }
 
-/* Responsivo */
+
 @media (max-width: 420px){
   .logo-glow{ --halo-size: 150px; }
+
 }
