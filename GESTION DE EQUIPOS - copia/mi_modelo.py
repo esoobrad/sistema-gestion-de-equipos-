@@ -10,7 +10,7 @@ def init_db():
     conn = conectar()
     c = conn.cursor()
 
-    # ===== TABLA EQUIPOS =====
+    # equipos
     c.execute("""
     CREATE TABLE IF NOT EXISTS equipos (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -35,7 +35,7 @@ def init_db():
     )
     """)
 
-    # ===== TABLA COMPONENTES =====
+    # =componentes
     c.execute("""
     CREATE TABLE IF NOT EXISTS componentes (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -54,7 +54,7 @@ def init_db():
     )
     """)
 
-    # ===== TABLA IMPRESORAS =====
+    # impres
     c.execute("""
     CREATE TABLE IF NOT EXISTS impresoras (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -68,7 +68,7 @@ def init_db():
     )
     """)
 
-    # ===== TABLA CÁMARAS =====
+    # camaras
     c.execute("""
     CREATE TABLE IF NOT EXISTS camaras (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -83,7 +83,7 @@ def init_db():
     )
     """)
 
-    # ===== TABLA OTROS =====
+    # otros
     c.execute("""
     CREATE TABLE IF NOT EXISTS otros (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -99,7 +99,7 @@ def init_db():
     )
     """)
 
-    # ===== INDEXES PARA BÚSQUEDAS RÁPIDAS POR IP =====
+    # busqueda de ip
     c.execute("CREATE INDEX IF NOT EXISTS idx_equipos_ip ON equipos(ip)")
     c.execute("CREATE INDEX IF NOT EXISTS idx_impresoras_ip ON impresoras(ip)")
     c.execute("CREATE INDEX IF NOT EXISTS idx_camaras_ip ON camaras(ip)")
@@ -109,9 +109,7 @@ def init_db():
     conn.close()
 
 
-# =========================================================
-# ==================== FUNCIONES GENERALES ================
-# =========================================================
+# funciones
 
 def obtener_todos(tabla):
     conn = conectar()
@@ -130,9 +128,6 @@ def eliminar_simple(tabla, id_reg):
     conn.close()
 
 
-# =========================================================
-# ==================== CRUD EQUIPOS ========================
-# =========================================================
 
 def obtener_equipo_por_id(eid):
     conn = conectar()
@@ -229,9 +224,7 @@ def buscar_equipos(q, empresa=None, solo_activos=True):
     return res
 
 
-# =========================================================
-# ================= CRUD COMPONENTES =======================
-# =========================================================
+
 
 def guardar_componente(datos):
     conn = conectar()
@@ -281,9 +274,6 @@ def set_componente_activo(id, valor):
     conn.close()
 
 
-# =========================================================
-# ================= CRUD IMPRESORAS ========================
-# =========================================================
 
 def guardar_impresora(datos):
     conn = conectar()
@@ -323,9 +313,6 @@ def obtener_impresora_por_id(iid):
     return r
 
 
-# =========================================================
-# ================= CRUD CÁMARAS ===========================
-# =========================================================
 
 def guardar_camara(datos):
     conn = conectar()
@@ -356,10 +343,6 @@ def obtener_camara_por_id(cid):
     conn.close()
     return r
 
-
-# =========================================================
-# ================= CRUD OTROS =============================
-# =========================================================
 
 def guardar_otro(datos):
     conn = conectar()
@@ -399,9 +382,6 @@ def obtener_otro_por_id(iid):
     return r
 
 
-# =========================================================
-# =============== 🔎 BÚSQUEDA GENERAL POR IP ===============
-# =========================================================
 
 def buscar_por_ip(ip):
     """
@@ -438,10 +418,6 @@ def buscar_por_ip(ip):
         "otros": otros
     }
 
-
-# =========================================================
-# =========== UTIL: IPs usadas y disponibles =============
-# =========================================================
 
 def obtener_ips_usadas():
     """Devuelve un set con todas las IPs (no vacías) encontradas en las tablas."""
@@ -503,3 +479,4 @@ def obtener_ips_disponibles(base_prefix, inicio=1, fin=254, max_resultados=500):
                 break
 
     return disponibles
+
