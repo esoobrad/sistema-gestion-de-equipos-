@@ -30,14 +30,12 @@ from mi_modelo import (
 )
 
 app = Flask(__name__)
-app.secret_key = "seguro123"
+app.secret_key = "seguro123" #esto esta en fase de prueba jajajaj no es el final
 init_db()
 
 UPLOAD_FOLDER = os.path.join("static", "uploads")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-
-# =============== Helpers ===============
 
 def login_requerido(f):
     @wraps(f)
@@ -56,9 +54,6 @@ def guardar_archivo_opcional(file_storage):
     file_storage.save(ruta)
     print(f"[UPLOAD] {ruta}")
     return ruta
-
-
-# =============== Auth/Errores ===============
 
 @app.errorhandler(BadRequestKeyError)
 def handle_bad_request_key_error(e):
@@ -87,8 +82,6 @@ def logout():
     return redirect("/login")
 
 
-# =============== Dashboard ===============
-
 @app.route("/")
 @login_requerido
 def dashboard():
@@ -109,8 +102,7 @@ def dashboard():
         resultados_ip=resultados_ip
     )
 
-
-# =============== Nueva página: IPs disponibles 192.168.3.x ===============
+#codigo de las ips libres para poder copiar y pegar
 
 @app.route("/ips_disponibles")
 @login_requerido
@@ -130,7 +122,7 @@ def ips_disponibles():
     )
 
 
-# =============== Equipos ===============
+#rutas
 
 @app.route("/equipos")
 @login_requerido
@@ -142,7 +134,7 @@ def ver_equipos():
     return render_template("dashboard_equipos.html",
                            equipos=equipos, empresa=empresa, q=q, ver_inactivos=ver_inactivos)
 
-# ✅ Atajo: /equipos/inactivos → redirige a la vista con el query param
+
 @app.route("/equipos/inactivos")
 @login_requerido
 def equipos_inactivos():
@@ -216,8 +208,8 @@ def editar_equipo(id):
 def toggle_activo_equipo(id):
     eq = obtener_equipo_por_id(id)
     if eq:
-        set_equipo_activo(id, 0 if (eq[18] == 1) else 1)  # índice 18 = activo
-    # ✅ vuelve a la página anterior (activos o inactivos)
+        set_equipo_activo(id, 0 if (eq[18] == 1) else 1)  
+ 
     return redirect(request.referrer or "/equipos")
 
 
@@ -255,7 +247,6 @@ def eliminar_archivo_equipo(id):
     return redirect(f"/equipo/{id}")
 
 
-# =============== Componentes ===============
 @app.route("/equipo/<int:equipo_id>/nuevo", methods=["GET", "POST"])
 @login_requerido
 def nuevo_componente(equipo_id):
@@ -333,7 +324,7 @@ def eliminar_archivo_componente(comp_id, equipo_id):
     return redirect(f"/equipo/{equipo_id}")
 
 
-# =============== Impresoras ===============
+
 @app.route("/impresoras")
 @login_requerido
 def ver_impresoras():
@@ -410,7 +401,6 @@ def eliminar_archivo_impresora(id):
     return redirect("/impresoras")
 
 
-# =============== Cámaras ===============
 @app.route("/camaras")
 @login_requerido
 def ver_camaras():
@@ -459,7 +449,6 @@ def eliminar_camara(id):
     return redirect("/camaras")
 
 
-# =============== Otros ===============
 @app.route("/otros")
 @login_requerido
 def ver_otros():
@@ -541,8 +530,6 @@ def eliminar_archivo_otro(id):
         actualizar_otro_archivo(id, "")
     return redirect("/otros")
 
-
-# =============== Reportes (PDF/CSV) ===============
 @app.route("/reporte_equipos")
 @login_requerido
 def reporte_equipos_pdf():
@@ -606,8 +593,6 @@ def reporte_otros_csv():
     generar_reporte_csv_otros()
     return redirect("/static/reporte_otros.csv")
 
-
-# =============== Descargas genéricas / util ===============
 @app.route("/uploads/<path:filename>")
 @login_requerido
 def descargar_upload(filename):
@@ -623,3 +608,4 @@ def routes():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+
