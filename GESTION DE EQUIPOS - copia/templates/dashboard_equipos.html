@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Gestión de Equipos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='estilo.css') }}">
+</head>
+
+<body class="dark-bg text-light">
+  <!-- Fondo animado -->
+  <canvas id="webgl-canvas" aria-hidden="true"></canvas>
+
+  <div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+      <div>
+        <h2 class="page-title mb-0">💻 Equipos {{ "inactivos" if ver_inactivos else "activos" }}</h2>
+        <p class="text-muted small mb-0">
+          Mostrando {{ equipos|length }} equipos {{ "inactivos" if ver_inactivos else "activos" }} registrados
+        </p>
+      </div>
+      <div class="d-flex gap-2">
+        <a href="/" class="btn btn-outline-light">← Volver</a>
+        {% if ver_inactivos %}
+          <a href="{{ url_for('ver_equipos') }}" class="btn btn-outline-success">Ver activos</a>
+        {% else %}
+          <a href="{{ url_for('equipos_inactivos') }}" class="btn btn-outline-warning">Ver inactivos</a>
+        {% endif %}
+        <a href="{{ url_for('nuevo_equipo') }}" class="btn btn-primary">+ Nuevo equipo</a>
+      </div>
+    </div>
+
+    <!-- Buscador -->
+    <form method="get" class="mb-4">
+      <div class="input-group">
+        <input type="text" name="q" value="{{ q or '' }}" placeholder="Buscar por nombre, IP, usuario, etc." class="form-control dark-input">
+        <button type="submit" class="btn btn-outline-info">Buscar</button>
+      </div>
+    </form>
+
+    <!-- Tabla -->
+    <div class="table-responsive dark-card p-3 rounded">
+      <table class="table table-dark table-hover align-middle">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>IP</th>
+            <th>Usuario asignado</th>
+            <th>Marca</th>
+            <th>Modelo</th>
+            <th>Empresa</th>
+            <th class="text-center">Estado</th>
+            <th class="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for equipo in equipos %}
+          <tr>
+            <td>{{ equipo[0] }}</td>
+            <td>{{ equipo[1] or "—" }}</td>
+            <td><span class="badge bg-accent">{{ equipo[4] or "—" }}</span></td>
+            <td>{{ equipo[9] or "—" }}</td>
+            <td>{{ equipo[5] or "—" }}</td>
+            <td>{{ equipo[6] or "—" }}</td>
+            <td>{{ equipo[17] or "—" }}</td>
+            <td class="text-center">
+              {% if equipo[18] == 1 %}
+                <span class="badge bg-success">Activo</span>
+              {% else %}
+                <span class="badge bg-secondary">Inactivo</span>
+              {% endif %}
+            </td>
+            <td class="text-center">
+              <div class="d-flex flex-wrap gap-2 justify-content-center">
+                <a href="{{ url_for('ver_equipo', id=equipo[0]) }}" class="btn btn-sm btn-outline-info" title="Ver equipo">🔍</a>
+                <a href="{{ url_for('editar_equipo', id=equipo[0]) }}" class="btn btn-sm btn-outline-light" title="Editar equipo">✏️</a>
+                <a href="{{ url_for('eliminar_equipo_route', id=equipo[0]) }}" 
+                   class="btn btn-sm btn-outline-danger" 
+                   title="Eliminar equipo"
+                   onclick="return confirm('¿Seguro que deseas eliminar este equipo?');">🗑️</a>
+                <form action="{{ url_for('toggle_activo_equipo', id=equipo[0]) }}" method="post" style="display:inline;">
+                  {% if equipo[18] == 1 %}
+                    <button type="submit" class="btn btn-sm btn-warning" title="Marcar como inactivo">🚫</button>
+                  {% else %}
+                    <button type="submit" class="btn btn-sm btn-success" title="Activar equipo">✅</button>
+                  {% endif %}
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% if not equipos %}
+      <div class="text-center text-muted mt-4">
+        No se encontraron equipos {{ "inactivos" if ver_inactivos else "activos" }}.
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- ===== Shaders ===== -->
+  <script id="js-vertex-shader" type="x-shader/x-vertex">
+  attribute vec3 position;
+  void main() { gl_Position = vec4(position, 1.0); }
+  </script>
+
+  <script id="js-fragment-shader" type="x-shader/x-fragment">
+  precision highp float;
+  uniform vec2 resolution; uniform float time; uniform float xScale; uniform float yScale; uniform float distortion;
+  void main() {
+    vec2 p = (gl_FragCoord.xy * 2.0 - resolution) / min(resolution.x, resolution.y);
+    float d = length(p) * distortion;
+    float rx = p.x * (1.0 + d), gx = p.x, bx = p.x * (1.0 - d);
+    float r = 0.05 / abs(p.y + sin((rx + time) * xScale) * yScale);
+    float g = 0.05 / abs(p.y + sin((gx + time) * xScale) * yScale);
+    float b = 0.05 / abs(p.y + sin((bx + time) * xScale) * yScale);
+    gl_FragColor = vec4(r, g, b, 1.0);
+  }
+  </script>
+
+  <!-- Three.js -->
+  <script src="https://unpkg.com/three@0.158.0/build/three.min.js"></script>
+
+  <!-- Fondo animado -->
+  <script>
+  class Stage {
+    constructor() {
+      this.renderParam = { clearColor: 0x0a0a0a, width: window.innerWidth, height: window.innerHeight };
+      this.cameraParam = { left: -1, right: 1, top: 1, bottom: -1, near: 0, far: 1 };
+    }
+    init() {
+      this.scene = new THREE.Scene();
+      this.renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("webgl-canvas"), antialias: true });
+      this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      this.renderer.setClearColor(new THREE.Color(this.renderParam.clearColor));
+      this.renderer.setSize(this.renderParam.width, this.renderParam.height, false);
+      this.camera = new THREE.OrthographicCamera(-1,1,1,-1,0,1);
+      this.camera.updateProjectionMatrix();
+    }
+    onResize() {
+      const w = window.innerWidth, h = window.innerHeight;
+      this.renderer.setSize(w, h, false);
+      this.camera.updateProjectionMatrix();
+    }
+    render() { this.renderer.render(this.scene, this.camera); }
+  }
+
+  class MeshPlane {
+    constructor(stage){
+      this.stage = stage;
+      this.uniforms = {
+        resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+        time:       { value: 0.0 },
+        xScale:     { value: 1.2 },
+        yScale:     { value: 0.55 },
+        distortion: { value: 0.050 }
+      };
+    }
+    init(){
+      const pos = new Float32Array([-1,-1,0, 1,-1,0, -1,1,0, 1,-1,0, -1,1,0, 1,1,0]);
+      const geom = new THREE.BufferGeometry();
+      geom.setAttribute("position", new THREE.BufferAttribute(pos,3));
+      const mat = new THREE.RawShaderMaterial({
+        vertexShader: document.getElementById("js-vertex-shader").textContent,
+        fragmentShader: document.getElementById("js-fragment-shader").textContent,
+        uniforms: this.uniforms, side: THREE.DoubleSide
+      });
+      this.mesh = new THREE.Mesh(geom, mat);
+      this.stage.scene.add(this.mesh);
+    }
+    onResize(){ this.uniforms.resolution.value.set(window.innerWidth, window.innerHeight); }
+    onRaf(){ this.uniforms.time.value += 0.01; }
+  }
+
+  (() => {
+    const stage = new Stage(); stage.init();
+    const mesh = new MeshPlane(stage); mesh.init();
+    const onResize = () => { stage.onResize(); mesh.onResize(); };
+    window.addEventListener("resize", onResize);
+    const loop = () => { requestAnimationFrame(loop); mesh.onRaf(); stage.render(); };
+    loop();
+  })();
+  </script>
+
+</body>
+</html>
+

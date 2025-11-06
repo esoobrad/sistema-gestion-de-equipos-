@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>IPs disponibles — {{ ip_prefix }}.x</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='estilo.css') }}">
+</head>
+<body class="dark-bg text-light">
+  <div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3">
+      <div>
+        <h1 class="page-title m-0">IPs disponibles</h1>
+        <p class="page-subtitle m-0 text-muted">
+          Red: <span class="badge bg-accent">{{ ip_prefix }}.x</span> ·
+          Usadas en BD: <span class="badge bg-soft">{{ total_usadas }}</span> ·
+          Libres: <span class="badge bg-soft" id="libres-count">{{ disponibles|length }}</span>
+        </p>
+      </div>
+      <div class="d-flex gap-2">
+        <a class="btn btn-outline-light" href="/">← Volver</a>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="dark-card p-3 mb-3">
+      <div class="row g-2 align-items-end">
+        <div class="col-12 col-md-4">
+          <label class="form-label small text-muted">Buscar IP</label>
+          <input id="filtroIp" type="text" class="form-control dark-input" placeholder="Escribe 192.168.3.120 o '120'">
+        </div>
+        <div class="col-6 col-md-2">
+          <label class="form-label small text-muted">Densidad</label>
+          <select id="densidad" class="form-select dark-input">
+            <option value="comoda" selected>Cómoda</option>
+            <option value="compacta">Compacta</option>
+          </select>
+        </div>
+        <div class="col-6 col-md-3">
+          <label class="form-label small text-muted">Rango</label>
+          <select id="rango" class="form-select dark-input">
+            <option value="all" selected>Todos (1–254)</option>
+            <option value="1-50">1–50</option>
+            <option value="51-100">51–100</option>
+            <option value="101-150">101–150</option>
+            <option value="151-200">151–200</option>
+            <option value="201-254">201–254</option>
+          </select>
+        </div>
+        <div class="col-6 col-md-3">
+          <label class="form-label small text-muted">Por página</label>
+          <select id="perPage" class="form-select dark-input">
+            <option>24</option>
+            <option selected>48</option>
+            <option>96</option>
+            <option>144</option>
+          </select>
+        </div>
+
+        <div class="col-12 col-md-12 d-flex gap-2 mt-2">
+          <button id="btnLimpiar" class="btn btn-outline-light">Limpiar filtros</button>
+          <button id="btnCopiarTodo" class="btn btn-outline-info">📋 Copiar todo</button>
+          <button id="btnExportCsv" class="btn btn-outline-success">⬇️ Exportar CSV</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contador + paginación -->
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+      <div class="text-muted small">
+        Mostrando <span id="mostrando-inicio">0</span>–<span id="mostrando-fin">0</span> de <span id="mostrando-total">0</span> IPs
+      </div>
+      <div class="d-flex gap-2">
+        <button class="btn btn-sm btn-outline-light" id="prevPage">‹</button>
+        <span class="badge bg-soft" id="pageIndicator">1 / 1</span>
+        <button class="btn btn-sm btn-outline-light" id="nextPage">›</button>
+      </div>
+    </div>
+
+    <!-- Grid -->
+    <div id="ipGrid" class="ip-grid"></div>
+
+    <!-- Paginación inferior -->
+    <div class="d-flex align-items-center justify-content-end mt-3">
+      <div class="d-flex gap-2">
+        <button class="btn btn-sm btn-outline-light" id="prevPage2">‹</button>
+        <span class="badge bg-soft" id="pageIndicator2">1 / 1</span>
+        <button class="btn btn-sm btn-outline-light" id="nextPage2">›</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== Fondo animado (Three.js + Shaders) ====== -->
+  <canvas id="webgl-canvas" aria-hidden="true"></canvas>
+
+  <!-- vertexShader -->
+  <script id="js-vertex-shader" type="x-shader/x-vertex">
+  attribute vec3 position;
+  void main() { gl_Position = vec4(position, 1.0); }
+  </script>
+
+  <!-- fragmentShader -->
+  <script id="js-fragment-shader" type="x-shader/x-fragment">
+  precision highp float;
+  uniform vec2 resolution; uniform float time; uniform float xScale; uniform float yScale; uniform float distortion;
+  void main() {
+    vec2 p = (gl_FragCoord.xy * 2.0 - resolution) / min(resolution.x, resolution.y);
+    float d = length(p) * distortion;
+    float rx = p.x * (1.0 + d), gx = p.x, bx = p.x * (1.0 - d);
+    float r = 0.05 / abs(p.y + sin((rx + time) * xScale) * yScale);
+    float g = 0.05 / abs(p.y + sin((gx + time) * xScale) * yScale);
+    float b = 0.05 / abs(p.y + sin((bx + time) * xScale) * yScale);
+    gl_FragColor = vec4(r, g, b, 1.0);
+  }
+  </script>
+
+  <!-- Three.js -->
+  <script src="https://unpkg.com/three@0.158.0/build/three.min.js"></script>
+
+  <!-- Data desde servidor -->
+  <script id="ips-data" type="application/json">{{ disponibles|tojson }}</script>
+
+  <script>
+  // ===== WEBGL de fondo (igual al dashboard)
+  class Stage {
+    constructor() {
+      this.renderParam = { clearColor: 0x0a0a0a, width: window.innerWidth, height: window.innerHeight };
+      this.cameraParam = { left: -1, right: 1, top: 1, bottom: -1, near: 0, far: 1 };
+      this.scene = null; this.camera = null; this.renderer = null; this.isInitialized = false;
+    }
+    init() {
+      this.scene = new THREE.Scene();
+      this.renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("webgl-canvas"), antialias: true });
+      this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      this.renderer.setClearColor(new THREE.Color(this.renderParam.clearColor));
+      this.renderer.setSize(this.renderParam.width, this.renderParam.height, false);
+      this.camera = new THREE.OrthographicCamera(-1,1,1,-1,0,1);
+      this.camera.updateProjectionMatrix();
+      this.isInitialized = true;
+    }
+    onResize() {
+      const w = window.innerWidth, h = window.innerHeight;
+      this.renderer.setSize(w, h, false);
+      this.camera.updateProjectionMatrix();
+    }
+    render() { this.renderer.render(this.scene, this.camera); }
+  }
+  class MeshPlane {
+    constructor(stage){
+      this.stage = stage;
+      this.uniforms = {
+        resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+        time:       { value: 0.0 },
+        xScale:     { value: 1.2 },
+        yScale:     { value: 0.55 },
+        distortion: { value: 0.050 }
+      };
+      this.mesh = null;
+    }
+    init(){
+      const position = new Float32Array([-1,-1,0, 1,-1,0, -1,1,0, 1,-1,0, -1,1,0, 1,1,0]);
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute("position", new THREE.BufferAttribute(position,3));
+      const material = new THREE.RawShaderMaterial({
+        vertexShader: document.getElementById("js-vertex-shader").textContent,
+        fragmentShader: document.getElementById("js-fragment-shader").textContent,
+        uniforms: this.uniforms, side: THREE.DoubleSide
+      });
+      this.mesh = new THREE.Mesh(geometry, material);
+      this.stage.scene.add(this.mesh);
+    }
+    onResize(){ this.uniforms.resolution.value.set(window.innerWidth, window.innerHeight); }
+    onRaf(){ this.uniforms.time.value += 0.01; }
+  }
+  (() => {
+    const stage = new Stage(); stage.init();
+    const mesh = new MeshPlane(stage); mesh.init();
+    const onResize = () => { stage.onResize(); mesh.onResize(); };
+    window.addEventListener("resize", onResize);
+    const loop = () => { requestAnimationFrame(loop); mesh.onRaf(); stage.render(); };
+    loop();
+  })();
+
+  // ===== UTILIDADES UI (copiar/filtrar/paginar/exportar)
+  const data = JSON.parse(document.getElementById('ips-data').textContent || "[]");
+  const elGrid = document.getElementById('ipGrid');
+  const filtroIp = document.getElementById('filtroIp');
+  const densidad = document.getElementById('densidad');
+  const rangoSel = document.getElementById('rango');
+  const perPageSel = document.getElementById('perPage');
+  const btnLimpiar = document.getElementById('btnLimpiar');
+  const btnCopiarTodo = document.getElementById('btnCopiarTodo');
+  const btnExportCsv = document.getElementById('btnExportCsv');
+
+  const mostrandoInicio = document.getElementById('mostrando-inicio');
+  const mostrandoFin = document.getElementById('mostrando-fin');
+  const mostrandoTotal = document.getElementById('mostrando-total');
+  const libresCount = document.getElementById('libres-count');
+  const pageIndicator = document.getElementById('pageIndicator');
+  const pageIndicator2 = document.getElementById('pageIndicator2');
+
+  const prevPage = document.getElementById('prevPage');
+  const nextPage = document.getElementById('nextPage');
+  const prevPage2 = document.getElementById('prevPage2');
+  const nextPage2 = document.getElementById('nextPage2');
+
+  let filtered = [...data];
+  let page = 1;
+
+  function lastOctet(ip){ return parseInt(ip.split('.').pop(), 10) || 0; }
+
+  function applyFilters(){
+    const q = (filtroIp.value || '').trim();
+    const rango = rangoSel.value;
+    const [min,max] = (rango==='all') ? [1,254] : rango.split('-').map(n=>parseInt(n,10));
+
+    filtered = data.filter(ip=>{
+      const oct = lastOctet(ip);
+      const enRango = (oct >= min && oct <= max);
+      if(!enRango) return false;
+      if(!q) return true;
+      return ip.includes(q) || (''+oct).includes(q);
+    });
+
+    libresCount.textContent = filtered.length;
+    page = 1;
+    render();
+  }
+
+  function render(){
+    const perPage = parseInt(perPageSel.value, 10);
+    const total = filtered.length;
+    const totalPages = Math.max(1, Math.ceil(total / perPage));
+    page = Math.min(Math.max(1, page), totalPages);
+
+    const start = (page - 1) * perPage;
+    const end = Math.min(start + perPage, total);
+    const slice = filtered.slice(start, end);
+
+    // Grid
+    elGrid.classList.toggle('compacta', densidad.value === 'compacta');
+    elGrid.innerHTML = slice.map(ip => `
+      <div class="ip-card">
+        <span class="ip">${ip}</span>
+        <button class="btn btn-sm btn-outline-light btn-copy" data-ip="${ip}" title="Copiar IP" aria-label="Copiar ${ip}">📋</button>
+      </div>
+    `).join('');
+
+    // Info
+    mostrandoInicio.textContent = total ? (start+1) : 0;
+    mostrandoFin.textContent = end;
+    mostrandoTotal.textContent = total;
+    pageIndicator.textContent = page + ' / ' + totalPages;
+    pageIndicator2.textContent = page + ' / ' + totalPages;
+  }
+
+  // ---- Utilidad robusta para copiar texto (con fallback) ----
+  function copyText(text){
+    if (navigator.clipboard && window.isSecureContext) {
+      return navigator.clipboard.writeText(text);
+    }
+    // Fallback con textarea
+    return new Promise((resolve, reject) => {
+      try{
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        ta.style.top = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        const ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        ok ? resolve() : reject(new Error('execCommand falló'));
+      }catch(err){ reject(err); }
+    });
+  }
+
+  // Eventos
+  filtroIp.addEventListener('input', applyFilters);
+  rangoSel.addEventListener('change', applyFilters);
+  densidad.addEventListener('change', render);
+  perPageSel.addEventListener('change', render);
+
+  btnLimpiar.addEventListener('click', ()=>{
+    filtroIp.value = '';
+    rangoSel.value = 'all';
+    densidad.value = 'comoda';
+    perPageSel.value = '48';
+    applyFilters();
+  });
+
+  btnCopiarTodo.addEventListener('click', ()=>{
+    if(!filtered.length) return;
+    const txt = filtered.join('\n');
+    copyText(txt).then(()=>{
+      const old = btnCopiarTodo.textContent;
+      btnCopiarTodo.textContent = '✅ Copiado';
+      btnCopiarTodo.classList.add('btn-success');
+      setTimeout(()=>{
+        btnCopiarTodo.textContent = '📋 Copiar todo';
+        btnCopiarTodo.classList.remove('btn-success');
+      }, 1200);
+    }).catch(err=>{
+      alert('No se pudo copiar: ' + err);
+    });
+  });
+
+  btnExportCsv.addEventListener('click', ()=>{
+    const rows = ['ip'];
+    filtered.forEach(ip=>rows.push(ip));
+    const blob = new Blob([rows.join('\n')], {type:'text/csv;charset=utf-8;'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'ips_disponibles.csv';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+
+  prevPage.addEventListener('click', ()=>{ page--; render(); });
+  nextPage.addEventListener('click', ()=>{ page++; render(); });
+  prevPage2.addEventListener('click', ()=>{ page--; render(); });
+  nextPage2.addEventListener('click', ()=>{ page++; render(); });
+
+  // Inicial
+  applyFilters();
+
+  // Copiar por botón (delegado, funciona tras re-render)
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.btn-copy');
+    if (!btn) return;
+    const ip = btn.getAttribute('data-ip');
+    copyText(ip).then(()=>{
+      const old = btn.textContent;
+      btn.textContent = '✅';
+      btn.classList.add('btn-success');
+      setTimeout(()=>{
+        btn.textContent = '📋';
+        btn.classList.remove('btn-success');
+      }, 900);
+    }).catch(err=>{
+      alert('No se pudo copiar: ' + err);
+    });
+  });
+  </script>
+</body>
+</html>

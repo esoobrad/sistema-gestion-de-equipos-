@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Iniciar sesión</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='estilo.css') }}">
+</head>
+<body class="dark-bg text-light d-flex align-items-center justify-content-center" style="min-height:100vh;">
+
+  <!-- ===== Fondo WebGL ===== -->
+  <canvas id="webgl-canvas" aria-hidden="true"></canvas>
+
+  <!-- Contenedor del login -->
+  <div class="login-box container col-md-4 col-lg-3 text-center">
+    <!-- 🔹 Logo con halo redondo -->
+    <div class="mb-4 logo-glow">
+      <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="login-logo">
+    </div>
+
+    <div class="dark-card p-4 rounded shadow-lg">
+      <h3 class="mb-3">🔐 Iniciar sesión</h3>
+
+      {% if error %}
+        <div class="alert alert-danger py-2">{{ error }}</div>
+      {% endif %}
+
+      <form method="post" action="/login" novalidate>
+        <div class="mb-3 text-start">
+          <label class="form-label">Usuario</label>
+          <input type="text" name="usuario" class="form-control dark-input" required autocomplete="username">
+        </div>
+        <div class="mb-3 text-start">
+          <label class="form-label">Contraseña</label>
+          <input type="password" name="clave" class="form-control dark-input" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Entrar</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ====== Shaders ====== -->
+  <script id="js-vertex-shader" type="x-shader/x-vertex">
+  attribute vec3 position;
+  void main() { gl_Position = vec4(position, 1.0); }
+  </script>
+
+  <script id="js-fragment-shader" type="x-shader/x-fragment">
+  precision highp float;
+  uniform vec2 resolution; uniform float time; uniform float xScale; uniform float yScale; uniform float distortion;
+  void main() {
+    vec2 p = (gl_FragCoord.xy * 2.0 - resolution) / min(resolution.x, resolution.y);
+    float d = length(p) * distortion;
+    float rx = p.x * (1.0 + d), gx = p.x, bx = p.x * (1.0 - d);
+    float r = 0.05 / abs(p.y + sin((rx + time) * xScale) * yScale);
+    float g = 0.05 / abs(p.y + sin((gx + time) * xScale) * yScale);
+    float b = 0.05 / abs(p.y + sin((bx + time) * xScale) * yScale);
+    gl_FragColor = vec4(r, g, b, 1.0);
+  }
+  </script>
+
+  <!-- Three.js -->
+  <script src="https://unpkg.com/three@0.158.0/build/three.min.js"></script>
+
+  <script>
+  // ===== WebGL Background =====
+  class Stage {
+    constructor() {
+      this.renderParam = { clearColor: 0x0a0a0a, width: window.innerWidth, height: window.innerHeight };
+      this.cameraParam = { left: -1, right: 1, top: 1, bottom: -1, near: 0, far: 1 };
+    }
+    init() {
+      this.scene = new THREE.Scene();
+      this.renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("webgl-canvas"), antialias: true });
+      this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      this.renderer.setClearColor(new THREE.Color(this.renderParam.clearColor));
+      this.renderer.setSize(this.renderParam.width, this.renderParam.height, false);
+      this.camera = new THREE.OrthographicCamera(-1,1,1,-1,0,1);
+      this.camera.updateProjectionMatrix();
+    }
+    onResize() {
+      const w = window.innerWidth, h = window.innerHeight;
+      this.renderer.setSize(w, h, false);
+      this.camera.updateProjectionMatrix();
+    }
+    render() { this.renderer.render(this.scene, this.camera); }
+  }
+
+  class MeshPlane {
+    constructor(stage){
+      this.stage = stage;
+      this.uniforms = {
+        resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+        time:       { value: 0.0 },
+        xScale:     { value: 1.2 },
+        yScale:     { value: 0.55 },
+        distortion: { value: 0.050 }
+      };
+    }
+    init(){
+      const position = new Float32Array([-1,-1,0, 1,-1,0, -1,1,0, 1,-1,0, -1,1,0, 1,1,0]);
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute("position", new THREE.BufferAttribute(position,3));
+      const material = new THREE.RawShaderMaterial({
+        vertexShader: document.getElementById("js-vertex-shader").textContent,
+        fragmentShader: document.getElementById("js-fragment-shader").textContent,
+        uniforms: this.uniforms, side: THREE.DoubleSide
+      });
+      const mesh = new THREE.Mesh(geometry, material);
+      this.stage.scene.add(mesh);
+      this.mesh = mesh;
+    }
+    onResize(){ this.uniforms.resolution.value.set(window.innerWidth, window.innerHeight); }
+    onRaf(){ this.uniforms.time.value += 0.01; }
+  }
+
+  (() => {
+    const stage = new Stage(); stage.init();
+    const mesh = new MeshPlane(stage); mesh.init();
+    const onResize = () => { stage.onResize(); mesh.onResize(); };
+    window.addEventListener("resize", onResize);
+    const loop = () => { requestAnimationFrame(loop); mesh.onRaf(); stage.render(); };
+    loop();
+  })();
+  </script>
+
+</body>
+</html>

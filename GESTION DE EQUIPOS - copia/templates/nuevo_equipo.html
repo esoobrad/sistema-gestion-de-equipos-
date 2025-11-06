@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Nuevo Equipo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='estilo.css') }}">
+</head>
+<body class="dark-bg text-light">
+    <div class="container col-md-6 my-4">
+        <h2 class="text-center mb-4">➕ Registrar Nuevo Equipo</h2>
+
+        <form method="post" enctype="multipart/form-data" class="p-4 rounded shadow dark-card">
+            <h5>💻 Datos generales</h5>
+            <div class="mb-3">
+                <label class="form-label">Nombre del equipo</label>
+                <input type="text" name="nombre" class="form-control dark-input" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Número de factura</label>
+                <input type="text" name="num_factura" class="form-control dark-input">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Dirección MAC</label>
+                <input type="text" name="mac" class="form-control dark-input">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Dirección IP</label>
+                <input type="text" name="ip" class="form-control dark-input">
+            </div>
+
+            <h5 class="mt-4">⚙️ Datos del equipo</h5>
+            <div class="mb-3">
+                <label class="form-label">Marca</label>
+                <input type="text" name="marca" class="form-control dark-input">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Modelo</label>
+                <input type="text" name="modelo" class="form-control dark-input">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Número de serie</label>
+                <input type="text" name="serie" class="form-control dark-input">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Fecha de compra</label>
+                <input type="date" name="fecha_compra" class="form-control dark-input">
+            </div>
+
+            <h5 class="mt-4">👤 Usuario</h5>
+            <div class="mb-3">
+                <label class="form-label">Usuario asignado</label>
+                <input type="text" name="usuario_asignado" class="form-control dark-input">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Usuario de dominio</label>
+                <input type="text" name="usuario_dominio" class="form-control dark-input">
+            </div>
+
+            <h5 class="mt-4">🏢 Empresa</h5>
+            <div class="mb-3">
+                <select name="empresa" class="form-select dark-input" required>
+                    <option value="Silicatos">Silicatos</option>
+                    <option value="Silcomer">Silcomer</option>
+                </select>
+            </div>
+
+            <h5 class="mt-4">🔒 Configuración</h5>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="en_dominio" value="Sí">
+                <label class="form-check-label">En dominio</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="tiene_symantec" value="Sí">
+                <label class="form-check-label">Tiene Symantec</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="bitlocker" value="Sí">
+                <label class="form-check-label">Tiene BitLocker</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="conectada_internet" value="Sí">
+                <label class="form-check-label">Conectada a Internet</label>
+            </div>
+
+            <h5 class="mt-4">📎 Archivo adjunto</h5>
+            <div class="mb-3">
+                <label class="form-label">Factura o documento (PDF/JPG/PNG)</label>
+                <input type="file" name="archivo" class="form-control dark-input">
+            </div>
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-success">Guardar</button>
+                <a href="/" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

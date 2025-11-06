@@ -1,0 +1,326 @@
+/* ===== Paleta y base ===== */
+:root{
+  --bg:#0b1220;          /* fondo principal */
+  --bg-card:#121a2b;     /* tarjetas */
+  --border:#20314d;      /* bordes sutiles */
+  --text:#e6edf3;        /* texto principal */
+  --muted:#aab6c5;       /* texto secundario */
+  --accent:#00b4d8;      /* acento (botones/links) */
+  --accent-2:#00d98f;    /* acento secundario */
+  --danger:#ef233c;
+  --soft:#24324d;        /* chips/badges suaves */
+  --shadow: 0 10px 24px rgba(0,0,0,.35);
+}
+
+html, body{
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.dark-bg{ background: var(--bg); color: var(--text); }
+
+.logo{ height:64px; border-radius: 10px; }
+
+/* ===== Login: logo grande con brillo (glow) ===== */
+.login-logo{
+  height:120px;
+  transition: transform .25s ease, filter .4s ease;
+  /* Glow azul en 3 capas (no requiere HTML extra) */
+  filter:
+    drop-shadow(0 0 10px rgba(30,144,255,0.85))
+    drop-shadow(0 0 26px rgba(0,180,255,0.45))
+    drop-shadow(0 0 42px rgba(0,120,255,0.28));
+}
+.login-logo:hover{
+  transform: scale(1.05);
+  filter:
+    drop-shadow(0 0 16px rgba(30,144,255,1))
+    drop-shadow(0 0 36px rgba(0,180,255,0.75))
+    drop-shadow(0 0 64px rgba(0,120,255,0.55));
+}
+
+/* (OPCIONAL) Halo animado deluxe: usar contenedor .logo-glow (ver nota al final) */
+.logo-glow{
+  position: relative;
+  display: inline-block;
+}
+.logo-glow::before{
+  content:"";
+  position:absolute; inset:-18px;
+  background: conic-gradient(from 0deg,
+    rgba(30,144,255,.0) 0%,
+    rgba(30,144,255,.45) 20%,
+    rgba(0,212,255,.55) 40%,
+    rgba(0,255,170,.45) 60%,
+    rgba(30,144,255,.0) 100%);
+  filter: blur(24px);
+  border-radius: 24px;
+  animation: haloSpin 8s linear infinite;
+  z-index: 0;
+}
+.logo-glow > .login-logo{ position: relative; z-index: 1; }
+@keyframes haloSpin{
+  0%{ transform: rotate(0deg); opacity:.9; }
+  50%{ opacity:.75; }
+  100%{ transform: rotate(360deg); opacity:.9; }
+}
+
+.page-title{
+  font-size: clamp(1.25rem, 1.5vw + .5rem, 1.8rem);
+  letter-spacing:.2px;
+  font-weight: 700;
+}
+.page-subtitle{ color: var(--muted); font-size:.9rem; }
+
+.dark-card{
+  background: linear-gradient(180deg, rgba(18,26,43,.96), rgba(18,26,43,.88));
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+}
+
+.search-card{ backdrop-filter: blur(6px); }
+
+.kpi-card .kpi-label{
+  color: var(--muted);
+  font-size:.9rem;
+  margin-bottom:.25rem;
+}
+.kpi-card .kpi-value{
+  font-weight:800;
+  font-size: 1.8rem;
+}
+
+.menu-card{
+  transition: transform .15s ease, box-shadow .15s ease;
+  text-decoration: none;
+  color: var(--text);
+}
+.menu-card:hover{ transform: translateY(-2px); box-shadow: 0 16px 38px rgba(0,0,0,.4); }
+.menu-emoji{ font-size:1.6rem; }
+.menu-title{ font-weight:700; margin-top:.25rem; }
+.menu-sub{ color: var(--muted); font-size:.9rem; }
+
+/* ===== Inputs y botones ===== */
+.dark-input{
+  background-color: #0d1526;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.dark-input:focus{
+  border-color: var(--accent);
+  box-shadow: 0 0 0 .2rem rgba(0,180,216,.15);
+  background-color: #0f1a30;
+  color: var(--text);
+}
+
+.btn{ border-radius:12px; }
+
+.btn-primary{
+  background-color: var(--accent);
+  border: none;
+}
+.btn-primary:hover{ filter: brightness(1.05); }
+
+.btn-success{
+  background-color: var(--accent-2);
+  border: none;
+}
+.btn-success:hover{ filter: brightness(1.05); }
+
+.btn-danger{ background-color: var(--danger); border:none; }
+.btn-outline-light{
+  color: var(--text);
+  border-color: var(--border);
+  background: transparent;
+}
+.btn-outline-light:hover{
+  color: var(--text);
+  background: #16213a;
+  border-color: var(--border);
+}
+.btn-pill{ border-radius: 999px; }
+
+/* ===== Tablas y badges ===== */
+.table-dark{
+  --bs-table-bg: #0e1628;
+  --bs-table-striped-bg: #0f1a30;
+  --bs-table-striped-color: var(--text);
+  --bs-table-hover-bg: #13213c;
+  color: var(--text);
+  border-color: var(--border);
+}
+.table thead th{ color: var(--muted); font-weight:600; border-bottom:1px solid var(--border); }
+
+.badge.bg-accent{
+  background: var(--accent);
+  color: #0b1220;
+  font-weight:700;
+}
+.badge.bg-soft{
+  background: var(--soft);
+  color: var(--text);
+  border: 1px solid var(--border);
+  font-weight:600;
+}
+
+/* ===== util ===== */
+.text-muted{ color: var(--muted) !important; }
+.section-title{ margin: 1rem 0 .5rem; font-weight:700; }
+
+/* ===== Canvas de fondo (full screen detrás del contenido) ===== */
+#webgl-canvas{
+  position: fixed;
+  inset: 0;           /* top:0; right:0; bottom:0; left:0 */
+  width: 100vw;
+  height: 100vh;
+  display: block;
+  z-index: 0;         /* detrás de todo */
+}
+
+/* Eleva el contenido por encima del canvas */
+body > *:not(#webgl-canvas){
+  position: relative;
+  z-index: 1;
+}
+
+/* Velo sutil para mejorar legibilidad sobre el canvas */
+.dark-bg::before{
+  content: "";
+  position: fixed;
+  inset: 0;
+  backdrop-filter: blur(0px); /* puedes subir a 2-4px si quieres suavizar */
+  background: rgba(0,0,0,0.25);
+  z-index: 0;
+}
+
+/* ===== Grid limpio para IPs ===== */
+.ip-grid{
+  display:grid;
+  gap:.75rem;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+.ip-grid.compacta{
+  gap:.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+}
+
+/* Tarjetas de IP: azul sólido, alto contraste */
+.ip-card{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:.6rem;
+  padding:.70rem .85rem;
+  border-radius:.9rem;
+
+  background: #00143aab;                 /* azul fuerte base */
+  border: 1px solid #00143aab;  /* borde azul vivo */
+  color: #ffffff;
+  box-shadow: 0 6px 16px rgba(10, 61, 145, .35);
+
+  backdrop-filter: none;               /* sin transparencia */
+  transition: transform .18s ease, background .18s ease, border-color .18s ease;
+}
+
+.ip-card .ip{
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: .98rem;
+  letter-spacing: .2px;
+  user-select: text;
+}
+
+.ip-card:hover{
+  background: #00050ca4;                 /* más oscuro al hover */
+  border-color: #2A6FF2;
+  transform: translateY(-2px);
+}
+
+.ip-card:focus-within{
+  outline: 2px solid #58A6FF;
+  outline-offset: 2px;
+}
+
+/* Botón copiar dentro de la tarjeta */
+.ip-card .btn-copy{
+  --btn-bg: #00143a;
+  --btn-bg-h: #00143a;
+  background: var(--btn-bg);
+  border: 1px solid #8BB9FF;
+  color: #fff;
+  padding: .25rem .55rem;
+  line-height: 1;
+}
+.ip-card .btn-copy:hover{
+  background: var(--btn-bg-h);
+  border-color: #B8D4FF;
+}
+.login-logo{
+  height:120px;
+  transition: transform .25s ease, filter .4s ease;
+  filter:
+    drop-shadow(0 0 10px rgba(30,144,255,0.85))
+    drop-shadow(0 0 26px rgba(0,180,255,0.45))
+    drop-shadow(0 0 42px rgba(0,120,255,0.28));
+}
+.login-logo:hover{
+  transform: scale(1.05);
+  filter:
+    drop-shadow(0 0 18px rgba(30,144,255,1))
+    drop-shadow(0 0 38px rgba(0,180,255,0.75))
+    drop-shadow(0 0 65px rgba(0,120,255,0.55));
+}
+
+/* Contenedor circular */
+.logo-glow{
+  --halo-size: 180px;        /* Tamaño del halo (ajústalo si lo quieres más grande o pequeño) */
+  position: relative;
+  width: var(--halo-size);
+  height: var(--halo-size);
+  margin: 0 auto 1rem auto;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+}
+
+/* Logo centrado dentro del círculo */
+.logo-glow > .login-logo{
+  max-width: 250%;
+  max-height: 250%;
+  object-fit: contain;
+  position: relative;
+  z-index: 1;
+}
+
+/* Halo circular animado azul-turquesa */
+.logo-glow::before{
+  content:"";
+  position:absolute;
+  inset:-10px;
+  width: calc(100% + 20px);
+  height: calc(100% + 20px);
+  border-radius: 50%;
+  background: conic-gradient(from 0deg,
+    rgba(30,144,255,0) 0%,
+    rgba(30,144,255,.45) 20%,
+    rgba(0,212,255,.55) 45%,
+    rgba(0,255,170,.45) 70%,
+    rgba(30,144,255,0) 100%);
+  filter: blur(24px);
+  animation: haloSpin 8s linear infinite;
+  z-index: 0;
+}
+
+/* Animación del halo circular */
+@keyframes haloSpin{
+  0%   { transform: rotate(0deg);   opacity:.9; }
+  50%  {                         opacity:.78; }
+  100% { transform: rotate(360deg); opacity:.9; }
+}
+
+/* Responsivo */
+@media (max-width: 420px){
+  .logo-glow{ --halo-size: 150px; }
+}

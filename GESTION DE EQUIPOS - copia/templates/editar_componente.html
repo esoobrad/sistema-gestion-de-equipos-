@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Editar componente</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='estilo.css') }}">
+</head>
+<body class="dark-bg text-light">
+<div class="container col-md-6 my-4">
+  <h2 class="text-center mb-4">✏️ Editar componente</h2>
+
+  <!-- índices:
+       0 id, 1 equipo_id, 2 software, 3 version, 4 serie_software,
+       5 id_producto, 6 llave, 7 proveedor, 8 aplica_proveedor,
+       9 fecha_compra, 10 fecha_vencimiento, 11 archivo
+  -->
+
+  <form method="post" enctype="multipart/form-data" class="p-4 rounded shadow dark-card">
+    <div class="mb-3">
+      <label class="form-label">Nombre del software o componente</label>
+      <input type="text" name="software" class="form-control dark-input" value="{{ comp[2] }}" required>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Versión</label>
+      <input type="text" name="version" class="form-control dark-input" value="{{ comp[3] }}">
+    </div>
+
+    <input type="hidden" name="serie_software" value="{{ comp[4] or '' }}">
+
+    <h5 class="mt-4">🔑 Licencia / Identificación</h5>
+    <div class="mb-3">
+      <label class="form-label">ID del producto</label>
+      <input type="text" name="id_producto" class="form-control dark-input" value="{{ comp[5] }}">
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Llave de licencia</label>
+      <input type="text" name="llave" class="form-control dark-input" value="{{ comp[6] }}">
+    </div>
+
+    <h5 class="mt-4">🏢 Proveedor</h5>
+    <div class="mb-3">
+      <label class="form-label">Nombre del proveedor</label>
+      <input type="text" name="proveedor" class="form-control dark-input" value="{{ comp[7] }}">
+    </div>
+
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" name="aplica_proveedor" value="Sí" id="aplicaProv"
+             {% if (comp[8] or '')|lower in ['sí','si','yes','true','1'] %}checked{% endif %}>
+      <label class="form-check-label" for="aplicaProv">Aplica proveedor</label>
+    </div>
+
+    <h5 class="mt-4">📅 Fechas</h5>
+    <div class="mb-3">
+      <label class="form-label" for="fechaCompraInput">Fecha de compra</label>
+      <input type="date" name="fecha_compra" id="fechaCompraInput" class="form-control dark-input"
+             value="{{ comp[9] }}">
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label" for="fechaVencInput">Fecha de vencimiento</label>
+      <input type="date" name="fecha_vencimiento" id="fechaVencInput" class="form-control dark-input"
+             value="{{ '' if (comp[10] or '')|upper == 'OEM' else comp[10] }}">
+
+      <div class="form-check mt-2">
+        <input class="form-check-input" type="checkbox" id="noAplicaCheckbox" name="no_aplica"
+               {% if not comp[10] %}checked{% endif %} onclick="toggleNoAplica()">
+        <label class="form-check-label" for="noAplicaCheckbox">No aplica</label>
+      </div>
+
+      <div class="form-check mt-2">
+        <input class="form-check-input" type="checkbox" id="oemCheckbox" name="oem"
+               {% if (comp[10] or '')|upper == 'OEM' %}checked{% endif %} onclick="toggleOEM()">
+        <label class="form-check-label" for="oemCheckbox">OEM / Sin vencimiento</label>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Archivo (PDF/JPG/PNG)</label>
+      <input type="file" name="archivo" class="form-control dark-input">
+      {% if comp[11] %}
+        <p class="mt-2 mb-2">
+          <span class="text-muted">Actual:</span>
+          {% set fname = (comp[11] or '')|replace('\\','/') %}
+          {% if 'static/uploads/' in fname %}
+            {% set fname = fname|replace('static/uploads/','') %}
+          {% endif %}
+          <a href="{{ url_for('descargar_upload', filename=fname) }}" target="_blank">Ver archivo</a>
+        </p>
+
+        <form action="/eliminar_archivo_componente/{{ comp[0] }}/{{ equipo_id }}" method="post"
+              onsubmit="return confirm('¿Eliminar el archivo adjunto de este componente?');">
+          <button type="submit" class="btn btn-outline-danger btn-sm">🗑️ Eliminar archivo</button>
+        </form>
+      {% endif %}
+    </div>
+
+    <div class="d-flex gap-2">
+      <button type="submit" class="btn btn-success">💾 Guardar cambios</button>
+      <a href="/equipo/{{ equipo_id }}" class="btn btn-secondary">Cancelar</a>
+    </div>
+  </form>
+</div>
+
+<script>
+const noAplicaCheckbox = document.getElementById("noAplicaCheckbox");
+const oemCheckbox = document.getElementById("oemCheckbox");
+const fechaVencInput = document.getElementById("fechaVencInput");
+
+function toggleOEM() {
+  if (oemCheckbox.checked) {
+    noAplicaCheckbox.checked = false;
+    fechaVencInput.value = '';
+    fechaVencInput.disabled = true;
+  } else {
+    fechaVencInput.disabled = noAplicaCheckbox.checked;
+  }
+}
+
+function toggleNoAplica() {
+  if (noAplicaCheckbox.checked) {
+    oemCheckbox.checked = false;
+    fechaVencInput.value = '';
+    fechaVencInput.disabled = true;
+  } else {
+    fechaVencInput.disabled = oemCheckbox.checked;
+  }
+}
+
+(function initVence() {
+  if (oemCheckbox.checked || noAplicaCheckbox.checked) {
+    fechaVencInput.disabled = true;
+  } else {
+    fechaVencInput.disabled = false;
+  }
+})();
+</script>
+
+</body>
+</html>

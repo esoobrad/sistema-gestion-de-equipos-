@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Otros</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='estilo.css') }}">
+</head>
+<body class="dark-bg text-light">
+<div class="container my-4">
+  <div class="d-flex align-items-center mb-3">
+    <h2 class="mb-0">🧩 Otros</h2>
+    <div class="ms-auto d-flex gap-2">
+      <a href="{{ url_for('nuevo_otro') }}" class="btn btn-success">➕ Nuevo</a>
+      <a href="{{ url_for('reporte_otros_pdf') }}" class="btn btn-primary">📄 PDF</a>
+      <a href="{{ url_for('reporte_otros_csv') }}" class="btn btn-warning">📁 CSV</a>
+      <a href="/" class="btn btn-secondary">🏠 Inicio</a>
+    </div>
+  </div>
+
+  {% if datos %}
+  <div class="table-responsive">
+    <table class="table table-dark text-center table-bordered align-middle">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Área</th>
+          <th>IP</th>
+          <th>Descripción</th>
+          <th>Archivo</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in datos %}
+        {# Orden: 0:id 1:marca 2:modelo 3:mac 4:ip 5:serie 6:area 7:nombre 8:descripcion 9:archivo #}
+        <tr>
+          <td>{{ r[7] or (r[2] or '—') }}</td>
+          <td>{{ r[6] or '—' }}</td>
+          <td>{{ r[4] or '—' }}</td>
+          <td class="text-start">{{ r[8] or '—' }}</td>
+          <td>
+            {% if r|length > 9 and r[9] %}
+              <a class="btn btn-outline-success btn-sm" target="_blank" href="{{ url_for('archivo_otro', id=r[0]) }}">📎 Ver</a>
+              <form method="post" action="{{ url_for('eliminar_archivo_otro', id=r[0]) }}" style="display:inline">
+                <button class="btn btn-outline-danger btn-sm" onclick="return confirm('¿Eliminar archivo?')">🗑</button>
+              </form>
+            {% else %}
+              —
+            {% endif %}
+          </td>
+          <td class="d-flex justify-content-center gap-2">
+            <a href="{{ url_for('editar_otro', id=r[0]) }}" class="btn btn-outline-warning btn-sm">✏️</a>
+            <a href="{{ url_for('eliminar_otro', id=r[0]) }}" class="btn btn-outline-danger btn-sm"
+               onclick="return confirm('¿Eliminar este registro?')">🗑️</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <p class="text-center text-muted mt-5">No hay registros en “Otros”.</p>
+  {% endif %}
+</div>
+</body>
+</html>

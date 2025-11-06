@@ -1,0 +1,47 @@
+﻿Empresa,Nombre,Marca,Modelo,Usuario,Dominio,Symantec,BitLocker,Internet,Fecha registro
+Silicatos,SISTEMAS,HP,700G1,Valentina Prado A.,Sí,Sí,Sí,Sí,2025-10-09
+Silicatos,Ventas1 WIF,HP,15-DW2049LA,Ing. Luis Sergio Barrena H.,Sí,Sí,Sí,Sí,2025-10-09
+Silicatos,Ventas1 ETHERNET,HP,N/A,Ing. Luis Sergio Barrena H.,No,No,No,No,2025-10-09
+Silicatos,Ventas2,HP,280 G5 SFF,Ana Rosa Martínez Soto,Sí,Sí,No,Sí,2025-10-09
+Silicatos,Ventas3,HP,280 G5 SFF,Leticia Uribe Ruiz,Sí,Sí,No,Sí,2025-10-09
+Silicatos,Ventas4,HP,700G1,Diana Laura Ovando Melendez,Sí,Sí,No,Sí,2025-10-09
+Silcomer,ATec3,HP,700G1,Ing. Abigail Méndez Merlo,Sí,Sí,No,Sí,2025-10-09
+Silcomer,ATec7,DELL,Optiplex 3050,Jessica Hernández Hernández,Sí,Sí,No,Sí,2025-10-09
+Silcomer,AuxCompras,HP,700G1,Denisse Alondra Herrera Vázquez,Sí,Sí,No,Sí,2025-10-09
+Silicatos,Soporte,HP,280 G5 SFF,Claudia Matlalcuatzi Morales,Sí,Sí,No,Sí,2025-10-09
+Silicatos,Contabilidad,DELL,LATITUDE 3520,C.P. Jorge Aguayo Solís,Sí,Sí,Sí,Sí,2025-10-09
+Silicatos,Contab2,HP,700G1,Nohemí Flemate Ortega,Sí,Sí,No,Sí,2025-10-09
+Silicatos,Contab3,DELL,Optiplex 3050,Luis Miguel Calles Montoya,Sí,Sí,No,Sí,2025-10-09
+Silicatos,Contab4,HP,Prodesk 600,C. Efrén Tlaxca Moreno,Sí,Sí,No,Sí,2025-10-09
+Silicatos,ALM1,HP,280 G5 SFF,Fernando Martínez Lira,Sí,Sí,No,Sí,2025-10-09
+Silicatos,ALMACEN,HP,DC7900,Auxiliar Almacén,Sí,Sí,No,No,2025-10-09
+Silicatos,RH2,HP,400G3,Juana Leticia Trejo Pérez,Sí,Sí,No,Sí,2025-10-09
+Silicatos,RH3,Ghia,PCGHIA-2615,N/A,Sí,Sí,No,No,2025-10-09
+Silicatos,JPlanta,HP,245 G7,VACANTE,Sí,Sí,No,Sí,2025-10-09
+Silicatos,Compras1,HP,280 G4,Oralia Mena Hernández,Sí,Sí,No,Sí,2025-10-09
+Silicatos,Compras2,HP,700G1,Guicel Martínez Corona,Sí,Sí,No,Sí,2025-10-09
+Silicatos,ENLACE OP,Lenovo,ThinkCentre M720s SFF,María Itzel Flores Chargoy,Sí,Sí,No,Sí,2025-10-09
+Silicatos,Produccion,HP,8200 ELITE,SUPERVISORES,Sí,Sí,No,No,2025-10-09
+Silicatos,Produccion2,HP,700G1,Ing. Jonathan Pilon,Sí,Sí,No,Sí,2025-10-09
+Silicatos,Produccion5,HP,800 G1,Ing. Javier Colón Aquino,Sí,Sí,No,Sí,2025-10-09
+Silicatos,Mantenimiento,HP,700G1,Ing. Jorge González Jiménez,Sí,Sí,No,Sí,2025-10-09
+Silicatos,Capacitación,Asus,ExpertBook B9,Ing. Rodolfo Escobedo G.,Sí,Sí,Sí,Sí,2025-10-09
+Silicatos,Capacitacion2,HP,PROBOOK 450 G3,ServicioMedico (Dra. Brenda Elizabeth Valdés),Sí,Sí,No,Sí,2025-10-09
+Silicatos,AsTecnica,Asus,ExpertBook B9,Ing. Daniela Martínez Díaz,Sí,Sí,Sí,Sí,2025-10-09
+Silicatos,Laboratorio,HP,600 G1,Analistas Laboratorio,Sí,Sí,No,Sí,2025-10-09
+Silicatos,MEZCLAS,HP,500BMT,Produccion,No,No,No,No,2025-10-09
+Silicatos,CCALIDAD,HP,700G1,Ing. Evelyn Limón,Sí,Sí,No,Sí,2025-10-09
+Silicatos,CCTV,HP,8200 ELITE,Ing. Sergio Barrena,No,Sí,No,Sí,2025-10-09
+Silicatos,SERVER-2023,HP,ML350 Gen 10,N/A,No,No,No,No,2025-10-09
+Silicatos,Mail server,Guia,PCGUIA-2774,N/A,No,No,No,Sí,2025-10-09
+Silicatos,Web Server,HP,PRO 8300,N/A,No,No,No,Sí,2025-10-09
+Silicatos,Firewall PC Negro,HP,PRO 3500 MT,N/A,No,No,No,Sí,2025-10-09
+Silicatos,BackupServer,HP,Elite 800 G1 Tower,N/A,No,No,No,No,2025-10-09
+Silcomer,SILCOMER1,HP,4440S,C.P. Jorge Aguayo Solis,No,Sí,No,No,2025-10-09
+Silcomer,CCalidadSilco,DELL,LATITUDE 3420,Yessica Jazmín Cocoletzi Mata,Sí,Sí,Sí,Sí,2025-10-09
+Silcomer,CCalidadSilco,N/A,N/A,N/A,No,No,No,No,2025-10-09
+Silcomer,Calidad2Silco,DELL,LATITUDE 3420,José Eduardo Cortés Leonel de Cervantes,Sí,Sí,Sí,Sí,2025-10-09
+Silcomer,Abastecimientos WIFI,N/A,N/A,N/A,No,No,No,No,2025-10-09
+Silcomer,ATec4,HP,280 G5 SFF,Irwvin Giovani Hernández de la Cruz,Sí,Sí,No,Sí,2025-10-09
+Silcomer,ACOMERCIAL,DELL,LATITUDE 3420,VACANTE,Sí,Sí,No,Sí,2025-10-09
+Silcomer,ACOMERCIAL2,DELL,LATITUDE 3420,VACANTE,Sí,Sí,No,Sí,2025-10-09
